@@ -1,0 +1,341 @@
+   Compiling bot v0.1.0 (/home/sgzmd/code/voicebot/bot)
+error[E0255]: the name `Command` is defined multiple times
+  --> src/main.rs:19:1
+   |
+5  | use std::process::Command;
+   |     --------------------- previous import of the type `Command` here
+...
+19 | enum Command {
+   | ^^^^^^^^^^^^ `Command` redefined here
+   |
+   = note: `Command` must be defined only once in the type namespace of this module
+help: you can use `as` to change the binding name of the import
+   |
+5  | use std::process::Command as OtherCommand;
+   |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+error[E0433]: failed to resolve: could not find `enable_logging` in `teloxide`
+ --> src/main.rs:9:15
+  |
+9 |     teloxide::enable_logging!();
+  |               ^^^^^^^^^^^^^^ could not find `enable_logging` in `teloxide`
+
+error[E0433]: failed to resolve: use of undeclared crate or module `log`
+  --> src/main.rs:10:5
+   |
+10 |     log::info!("Starting bot...");
+   |     ^^^ use of undeclared crate or module `log`
+
+error: cannot find derive macro `BotCommands` in this scope
+  --> src/main.rs:17:10
+   |
+17 | #[derive(BotCommands)]
+   |          ^^^^^^^^^^^
+   |
+note: `BotCommands` is imported here, but it is only a trait, without a derive macro
+  --> src/main.rs:3:5
+   |
+3  | use teloxide::utils::command::BotCommands;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: cannot find attribute `command` in this scope
+  --> src/main.rs:18:3
+   |
+18 | #[command(rename = "lowercase", description = "These commands are supported:")]
+   |   ^^^^^^^
+
+error: cannot find attribute `command` in this scope
+  --> src/main.rs:20:7
+   |
+20 |     #[command(description = "recognize the attached audio file.")]
+   |       ^^^^^^^
+
+error: cannot find attribute `command` in this scope
+  --> src/main.rs:22:7
+   |
+22 |     #[command(description = "summarize the attached text and/or audio")]
+   |       ^^^^^^^
+
+error: cannot find attribute `command` in this scope
+  --> src/main.rs:24:7
+   |
+24 |     #[command(description = "display this text.")]
+   |       ^^^^^^^
+
+warning: use of deprecated function `teloxide::commands_repl`: Use `CommandsRepl::repl` instead
+  --> src/main.rs:14:15
+   |
+14 |     teloxide::commands_repl(bot, "MyBot", answer).await;
+   |               ^^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated struct `teloxide::prelude::AutoSend`: `AutoSend` is no longer required to `.await` requests and is now noop
+  --> src/main.rs:28:22
+   |
+28 | async fn answer(bot: AutoSend<Bot>, msg: Message, cmd: Command) -> ResponseResult<()> {
+   |                      ^^^^^^^^
+
+warning: use of deprecated struct `teloxide::prelude::AutoSend`: `AutoSend` is no longer required to `.await` requests and is now noop
+  --> src/main.rs:52:29
+   |
+52 | async fn process_audio(bot: AutoSend<Bot>, msg: Message, audio: teloxide::types::Audio) -> ResponseResult<()> {
+   |                             ^^^^^^^^
+
+error[E0599]: no associated item named `Recognize` found for struct `std::process::Command` in the current scope
+  --> src/main.rs:30:18
+   |
+30 |         Command::Recognize => {
+   |                  ^^^^^^^^^ associated item not found in `Command`
+
+error[E0599]: no associated item named `Summarize` found for struct `std::process::Command` in the current scope
+  --> src/main.rs:37:18
+   |
+37 |         Command::Summarize => {
+   |                  ^^^^^^^^^ associated item not found in `Command`
+
+error[E0599]: no associated item named `Help` found for struct `std::process::Command` in the current scope
+  --> src/main.rs:44:18
+   |
+44 |         Command::Help => {
+   |                  ^^^^ associated item not found in `Command`
+
+error[E0308]: mismatched types
+  --> src/main.rs:32:41
+   |
+32 |                 process_audio(bot, msg, audio).await?;
+   |                 -------------           ^^^^^ expected `Audio`, found `&Audio`
+   |                 |
+   |                 arguments to this function are incorrect
+   |
+note: function defined here
+  --> src/main.rs:52:10
+   |
+52 | async fn process_audio(bot: AutoSend<Bot>, msg: Message, audio: teloxide::types::Audio) -> ResponseResult<()> {
+   |          ^^^^^^^^^^^^^                                   -----------------------------
+help: consider using clone here
+   |
+32 |                 process_audio(bot, msg, audio.clone()).await?;
+   |                                              ++++++++
+
+error[E0615]: attempted to take value of method `text` on type `teloxide::prelude::Message`
+  --> src/main.rs:38:38
+   |
+38 |             if let Some(text) = &msg.text {
+   |                                      ^^^^ method, not a field
+   |
+help: use parentheses to call the method
+   |
+38 |             if let Some(text) = &msg.text() {
+   |                                          ++
+
+error[E0599]: no function or associated item named `descriptions` found for struct `std::process::Command` in the current scope
+   --> src/main.rs:45:52
+    |
+45  |             bot.send_message(msg.chat.id, Command::descriptions()).await?;
+    |                                                    ^^^^^^^^^^^^ function or associated item not found in `Command`
+    |
+note: if you're trying to build a new `std::process::Command`, consider using `std::process::Command::new` which returns `std::process::Command`
+   --> /home/sgzmd/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/std/src/process.rs:633:5
+    |
+633 |     pub fn new<S: AsRef<OsStr>>(program: S) -> Command {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0609]: no field `file_id` on type `teloxide::types::Audio`
+  --> src/main.rs:53:35
+   |
+53 |     let file = bot.get_file(audio.file_id.clone()).await?;
+   |                                   ^^^^^^^ unknown field
+   |
+   = note: available fields are: `file`, `duration`, `performer`, `title`, `file_name` ... and 2 others
+
+warning: use of deprecated method `teloxide::prelude::AutoSend::<B>::inner`: `AutoSend` is no longer required to `.await` requests and is now noop
+  --> src/main.rs:54:75
+   |
+54 |     let file_path = format!("https://api.telegram.org/file/bot{}/{}", bot.inner().token(), file.file_path);
+   |                                                                           ^^^^^
+
+error[E0609]: no field `file_path` on type `teloxide::types::File`
+  --> src/main.rs:54:97
+   |
+54 |     let file_path = format!("https://api.telegram.org/file/bot{}/{}", bot.inner().token(), file.file_path);
+   |                                                                                                 ^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `meta`, `path`
+   = note: available fields are: `id`, `unique_id`, `size`
+
+error[E0277]: the size for values of type `str` cannot be known at compilation time
+   --> src/main.rs:71:46
+    |
+71  |         let mut ictx = ffmpeg::format::input(input_path).unwrap();
+    |                        --------------------- ^^^^^^^^^^ doesn't have a size known at compile-time
+    |                        |
+    |                        required by a bound introduced by this call
+    |
+    = help: the trait `Sized` is not implemented for `str`
+note: required by an implicit `Sized` bound in `ffmpeg_next::format::input`
+   --> /home/sgzmd/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ffmpeg-next-4.4.0/src/format/mod.rs:147:14
+    |
+147 | pub fn input<P: AsRef<Path>>(path: &P) -> Result<context::Input, Error> {
+    |              ^ required by the implicit `Sized` requirement on this type parameter in `input`
+
+error[E0277]: the size for values of type `str` cannot be known at compilation time
+   --> src/main.rs:72:47
+    |
+72  |         let mut octx = ffmpeg::format::output(output_path).unwrap();
+    |                        ---------------------- ^^^^^^^^^^^ doesn't have a size known at compile-time
+    |                        |
+    |                        required by a bound introduced by this call
+    |
+    = help: the trait `Sized` is not implemented for `str`
+note: required by an implicit `Sized` bound in `ffmpeg_next::format::output`
+   --> /home/sgzmd/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ffmpeg-next-4.4.0/src/format/mod.rs:218:15
+    |
+218 | pub fn output<P: AsRef<Path>>(path: &P) -> Result<context::Output, Error> {
+    |               ^ required by the implicit `Sized` requirement on this type parameter in `output`
+
+error[E0599]: no method named `open` found for struct `ffmpeg_next::codec::Context` in the current scope
+  --> src/main.rs:78:20
+   |
+78 |             icodec.open().unwrap();
+   |                    ^^^^ method not found in `Context`
+
+error[E0599]: no method named `open` found for struct `ffmpeg_next::codec::Context` in the current scope
+  --> src/main.rs:80:20
+   |
+80 |             ocodec.open().unwrap();
+   |                    ^^^^ method not found in `Context`
+
+error[E0599]: no method named `receive_frame` found for struct `ffmpeg_next::codec::Context` in the current scope
+  --> src/main.rs:85:39
+   |
+85 |             while let Ok(..) = icodec.receive_frame(&mut in_frame) {
+   |                                       ^^^^^^^^^^^^^ method not found in `Context`
+
+error[E0599]: no method named `send_frame` found for struct `ffmpeg_next::codec::Context` in the current scope
+  --> src/main.rs:86:24
+   |
+86 |                 ocodec.send_frame(&in_frame).unwrap();
+   |                        ^^^^^^^^^^ method not found in `Context`
+
+error[E0599]: no method named `receive_frame` found for struct `ffmpeg_next::codec::Context` in the current scope
+  --> src/main.rs:87:43
+   |
+87 |                 while let Ok(..) = ocodec.receive_frame(&mut out_frame) {
+   |                                           ^^^^^^^^^^^^^ method not found in `Context`
+
+error[E0599]: no method named `write_frame` found for struct `ffmpeg_next::format::context::Output` in the current scope
+  --> src/main.rs:88:26
+   |
+88 |                     octx.write_frame(&out_frame).unwrap();
+   |                          ^^^^^^^^^^^
+   |
+help: there is a method `write_trailer` with a similar name, but with different arguments
+  --> /home/sgzmd/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ffmpeg-next-4.4.0/src/format/context/output.rs:64:5
+   |
+64 |     pub fn write_trailer(&mut self) -> Result<(), Error> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `teloxide::prelude::RequesterExt::auto_send`: `AutoSend` is no longer required to `.await` requests and is now noop
+  --> src/main.rs:12:31
+   |
+12 |     let bot = Bot::from_env().auto_send();
+   |                               ^^^^^^^^^
+
+error[E0277]: the trait bound `&str: Injectable<DependencyMap, Result<(), RequestError>, _>` is not satisfied
+   --> src/main.rs:14:34
+    |
+14  |     teloxide::commands_repl(bot, "MyBot", answer).await;
+    |     -----------------------      ^^^^^^^ the trait `Injectable<DependencyMap, Result<(), RequestError>, _>` is not implemented for `&str`
+    |     |
+    |     required by a bound introduced by this call
+    |
+    = help: the following other types implement trait `Injectable<Input, Output, FnArgs>`:
+              <Asyncify<Func> as Injectable<Input, Output, ()>>
+              <Asyncify<Func> as Injectable<Input, Output, (A, B)>>
+              <Asyncify<Func> as Injectable<Input, Output, (A, B, C)>>
+              <Asyncify<Func> as Injectable<Input, Output, (A, B, C, D)>>
+              <Asyncify<Func> as Injectable<Input, Output, (A, B, C, D, E)>>
+              <Asyncify<Func> as Injectable<Input, Output, (A, B, C, D, E, F)>>
+              <Asyncify<Func> as Injectable<Input, Output, (A, B, C, D, E, F, G)>>
+              <Asyncify<Func> as Injectable<Input, Output, (A, B, C, D, E, F, G, H)>>
+            and 2 others
+note: required by a bound in `commands_repl`
+   --> /home/sgzmd/.cargo/registry/src/index.crates.io-6f17d22bba15001f/teloxide-0.12.2/src/repls/commands_repl.rs:205:8
+    |
+201 | pub async fn commands_repl<'a, R, Cmd, H, Args>(bot: R, handler: H, cmd: PhantomData<Cmd>)
+    |              ------------- required by a bound in this function
+...
+205 |     H: Injectable<DependencyMap, ResponseResult<()>, Args> + Send + Sync + 'static,
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by this bound in `commands_repl`
+
+error[E0308]: mismatched types
+   --> src/main.rs:14:43
+    |
+14  |     teloxide::commands_repl(bot, "MyBot", answer).await;
+    |     -----------------------               ^^^^^^ expected `PhantomData<_>`, found fn item
+    |     |
+    |     arguments to this function are incorrect
+    |
+    = note: expected struct `PhantomData<_>`
+              found fn item `fn(teloxide::prelude::AutoSend<teloxide::Bot>, teloxide::prelude::Message, std::process::Command) -> impl Future<Output = Result<(), RequestError>> {answer}`
+note: function defined here
+   --> /home/sgzmd/.cargo/registry/src/index.crates.io-6f17d22bba15001f/teloxide-0.12.2/src/repls/commands_repl.rs:201:14
+    |
+201 | pub async fn commands_repl<'a, R, Cmd, H, Args>(bot: R, handler: H, cmd: PhantomData<Cmd>)
+    |              ^^^^^^^^^^^^^
+
+error[E0277]: the trait bound `&str: Injectable<DependencyMap, Result<(), RequestError>, _>` is not satisfied
+   --> src/main.rs:14:5
+    |
+14  |     teloxide::commands_repl(bot, "MyBot", answer).await;
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ the trait `Injectable<DependencyMap, Result<(), RequestError>, _>` is not implemented for `&str`
+    |
+    = help: the following other types implement trait `Injectable<Input, Output, FnArgs>`:
+              <Asyncify<Func> as Injectable<Input, Output, ()>>
+              <Asyncify<Func> as Injectable<Input, Output, (A, B)>>
+              <Asyncify<Func> as Injectable<Input, Output, (A, B, C)>>
+              <Asyncify<Func> as Injectable<Input, Output, (A, B, C, D)>>
+              <Asyncify<Func> as Injectable<Input, Output, (A, B, C, D, E)>>
+              <Asyncify<Func> as Injectable<Input, Output, (A, B, C, D, E, F)>>
+              <Asyncify<Func> as Injectable<Input, Output, (A, B, C, D, E, F, G)>>
+              <Asyncify<Func> as Injectable<Input, Output, (A, B, C, D, E, F, G, H)>>
+            and 2 others
+note: required by a bound in `commands_repl`
+   --> /home/sgzmd/.cargo/registry/src/index.crates.io-6f17d22bba15001f/teloxide-0.12.2/src/repls/commands_repl.rs:205:8
+    |
+201 | pub async fn commands_repl<'a, R, Cmd, H, Args>(bot: R, handler: H, cmd: PhantomData<Cmd>)
+    |              ------------- required by a bound in this function
+...
+205 |     H: Injectable<DependencyMap, ResponseResult<()>, Args> + Send + Sync + 'static,
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by this bound in `commands_repl`
+
+error[E0277]: the trait bound `&str: Injectable<DependencyMap, Result<(), RequestError>, _>` is not satisfied
+   --> src/main.rs:14:51
+    |
+14  |     teloxide::commands_repl(bot, "MyBot", answer).await;
+    |                                                   ^^^^^ the trait `Injectable<DependencyMap, Result<(), RequestError>, _>` is not implemented for `&str`
+    |
+    = help: the following other types implement trait `Injectable<Input, Output, FnArgs>`:
+              <Asyncify<Func> as Injectable<Input, Output, ()>>
+              <Asyncify<Func> as Injectable<Input, Output, (A, B)>>
+              <Asyncify<Func> as Injectable<Input, Output, (A, B, C)>>
+              <Asyncify<Func> as Injectable<Input, Output, (A, B, C, D)>>
+              <Asyncify<Func> as Injectable<Input, Output, (A, B, C, D, E)>>
+              <Asyncify<Func> as Injectable<Input, Output, (A, B, C, D, E, F)>>
+              <Asyncify<Func> as Injectable<Input, Output, (A, B, C, D, E, F, G)>>
+              <Asyncify<Func> as Injectable<Input, Output, (A, B, C, D, E, F, G, H)>>
+            and 2 others
+note: required by a bound in `commands_repl`
+   --> /home/sgzmd/.cargo/registry/src/index.crates.io-6f17d22bba15001f/teloxide-0.12.2/src/repls/commands_repl.rs:205:8
+    |
+201 | pub async fn commands_repl<'a, R, Cmd, H, Args>(bot: R, handler: H, cmd: PhantomData<Cmd>)
+    |              ------------- required by a bound in this function
+...
+205 |     H: Injectable<DependencyMap, ResponseResult<()>, Args> + Send + Sync + 'static,
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by this bound in `commands_repl`
+
+Some errors have detailed explanations: E0255, E0277, E0308, E0433, E0599, E0609, E0615.
+For more information about an error, try `rustc --explain E0255`.
+warning: `bot` (bin "bot") generated 5 warnings
+error: could not compile `bot` (bin "bot") due to 28 previous errors; 5 warnings emitted
