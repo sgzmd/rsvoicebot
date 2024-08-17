@@ -1,7 +1,8 @@
 use hound::{WavSpec, WavWriter};
+use rubato::{Resampler, SincFixedIn, SincInterpolationParameters, SincInterpolationType as InterpolationType, WindowFunction};
 use std::error::Error;
 use std::io::Cursor;
-use symphonia::core::audio::SampleBuffer;
+use symphonia::core::audio::{SampleBuffer, SignalSpec};
 use symphonia::core::codecs::DecoderOptions;
 use symphonia::core::errors::Error as SymphoniaError;
 use symphonia::core::formats::FormatOptions;
@@ -50,10 +51,14 @@ pub mod audio_conversion {
             let mut decoder = symphonia::default::get_codecs()
                 .make(&track.codec_params, &DecoderOptions::default())?;
 
-            // Create the WAV spec
+            // Retrieve the original sample rate
+            let original_sample_rate = track.codec_params.sample_rate.unwrap();
+            let num_channels = track.codec_params.channels.unwrap().count();
+
+            // Create a WAV spec for 16 kHz mono
             let spec = WavSpec {
-                channels: track.codec_params.channels.unwrap().count() as u16,
-                sample_rate: track.codec_params.sample_rate.unwrap(),
+                channels: 1, // Mono
+                sample_rate: 16000, // 16 kHz
                 bits_per_sample: 16,
                 sample_format: hound::SampleFormat::Int,
             };
@@ -63,7 +68,30 @@ pub mod audio_conversion {
             {
                 let mut writer = WavWriter::new(&mut wav_buffer, spec)?;
 
-                // Decode and write packets
+                // Set up the resampler with appropriate parameters
+                let resample_ratio = 16000.0 / original_sample_rate as f64;
+                let max_resample_ratio_relative = 10.0; // Set maximum resampling ratio, e.g., 10.0
+                let sinc_len = 64; // Length of the sinc interpolation kernel
+                let oversampling_factor = 128; // Oversampling factor for the resampler
+                let chunk_size = 1024; // Size of input data in frames
+
+                let params = SincInterpolationParameters {
+                    sinc_len,
+                    f_cutoff: 0.95, // Cutoff frequency
+                    interpolation: InterpolationType::Linear, // Interpolation type
+                    oversampling_factor,
+                    window: WindowFunction::BlackmanHarris2, // Window function
+                };
+
+                let mut resampler = SincFixedIn::<f64>::new(
+                    resample_ratio,
+                    max_resample_ratio_relative,
+                    params,
+                    chunk_size,
+                    1, // Mono output
+                )?;
+
+                // Decode and process packets
                 loop {
                     let packet = match format.next_packet() {
                         Ok(packet) => packet,
@@ -89,9 +117,26 @@ pub mod audio_conversion {
                     let mut sample_buffer = SampleBuffer::<i16>::new(decoded.capacity() as u64, *decoded.spec());
                     sample_buffer.copy_interleaved_ref(decoded);
 
-                    // Write the samples to the WAV buffer
-                    for &sample in sample_buffer.samples() {
-                        writer.write_sample(sample)?;
+                    // Mix to mono if needed
+                    let samples = sample_buffer.samples();
+                    let mut mono_samples: Vec<f64> = Vec::with_capacity(samples.len() / num_channels);
+
+                    for i in (0..samples.len()).step_by(num_channels) {
+                        // Mix to mono by averaging channels
+                        let mut mono_sample = 0.0;
+                        for c in 0..num_channels {
+                            mono_sample += samples[i + c] as f64;
+                        }
+                        mono_sample /= num_channels as f64;
+                        mono_samples.push(mono_sample);
+                    }
+
+                    // Resample to 16 kHz
+                    let resampled_samples = resampler.process(&[mono_samples], None)?;
+
+                    // Write the resampled mono samples to the WAV buffer
+                    for &sample in resampled_samples[0].iter() {
+                        writer.write_sample(sample as i16)?;
                     }
                 }
             }
