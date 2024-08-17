@@ -1,5 +1,6 @@
+use hound::{WavSpec, WavWriter};
 use std::error::Error;
-use std::io::{Cursor, Seek, Write};
+use std::io::Cursor;
 use symphonia::core::audio::SampleBuffer;
 use symphonia::core::codecs::DecoderOptions;
 use symphonia::core::errors::Error as SymphoniaError;
@@ -7,7 +8,6 @@ use symphonia::core::formats::FormatOptions;
 use symphonia::core::io::MediaSourceStream;
 use symphonia::core::meta::MetadataOptions;
 use symphonia::core::probe::Hint;
-use hound::{WavSpec, WavWriter};
 
 pub mod audio_conversion {
     use super::*;
@@ -20,7 +20,7 @@ pub mod audio_conversion {
 
     impl AudioConverter for SymphoniaConverter {
         fn convert_audio_to_wav(&self, input_data: &[u8]) -> Result<Vec<u8>, Box<dyn Error>> {
-            let my_input_data = input_data.clone().to_owned();
+            let my_input_data = input_data.to_owned();
 
             // Create a cursor for the input data
             let cursor = Cursor::new(my_input_data);

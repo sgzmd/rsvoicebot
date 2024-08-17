@@ -22,5 +22,10 @@ mod tests {
         // Optionally, write the WAV data to a file for manual inspection
         fs::write("test_assets/output.wav", &wav_data)
             .expect("Failed to write output WAV file");
+
+        // Compare golden.wav with produced data
+        let golden_data = fs::read("test_assets/golden.wav")
+            .expect("Failed to read golden WAV file");
+        assert_eq!(wav_data, golden_data);
     }
 }
