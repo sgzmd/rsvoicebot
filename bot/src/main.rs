@@ -2,7 +2,6 @@ use teloxide::{net::Download, prelude::*, types::BotCommand, utils::command::Bot
 use voicebot::audio_conversion::audio_conversion::AudioConverter;
 use std::error::Error;
 use teloxide::types::Currency::AUD;
-use voicebot::symphonia_converter::symphonia_converter::SymphoniaConverter;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
@@ -60,15 +59,15 @@ async fn recognize(bot: Bot, msg: Message) -> ResponseResult<()> {
         let mut buffer: Vec<u8> = Vec::new();
         bot.download_file(&file.path, &mut buffer).await?;
 
-        let converter = SymphoniaConverter;
-        let wavbytes = converter.convert_audio_to_wav(buffer.as_slice());
-
-        if wavbytes.is_ok() {
-            log::info!(
-                "Successfully converted audio to wav, {} bytes read",
-                wavbytes.unwrap().len()
-            );
-        }
+        // let converter = SymphoniaConverter;
+        // let wavbytes = converter.convert_audio_to_wav(buffer.as_slice());
+        //
+        // if wavbytes.is_ok() {
+        //     log::info!(
+        //         "Successfully converted audio to wav, {} bytes read",
+        //         wavbytes.unwrap().len()
+        //     );
+        // }
     }
 
     bot.send_message(msg.chat.id, response).await?;

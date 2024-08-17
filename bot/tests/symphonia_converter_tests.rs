@@ -1,8 +1,8 @@
 #[cfg(test)]
 mod tests {
     use std::fs;
-    use voicebot::symphonia_converter::symphonia_converter::SymphoniaConverter;
-    use voicebot::audio_conversion::audio_conversion::AudioConverter;
+    use voicebot::symphonia_converter::audio_conversion::SymphoniaConverter;
+    use voicebot::symphonia_converter::audio_conversion::AudioConverter;
 
     #[test]
     fn test_mp3_to_wav_conversion() {
@@ -15,13 +15,12 @@ mod tests {
 
         // Convert the MP3 file to WAV format
         let result = converter.convert_audio_to_wav(&input_data);
-
         let wav_data = result.expect("Audio conversion failed");
-
 
         assert!(!wav_data.is_empty(), "Output WAV data is empty");
 
         // Optionally, write the WAV data to a file for manual inspection
-        fs::write("test_assets/output.wav", &wav_data).expect("Failed to write output WAV file");
+        fs::write("test_assets/output.wav", &wav_data)
+            .expect("Failed to write output WAV file");
     }
 }
