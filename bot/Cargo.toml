@@ -12,6 +12,8 @@ tempfile = "3.12.0"
 symphonia = { version = "0.5.4", features = ["all", "opt-simd"] }
 hound = "3.5"
 rubato = "0.15.0"
+whisper-rs = "0.8.0"
+
 
 [[bin]]
 name = "voicebot"
