@@ -35,6 +35,7 @@ pub mod speech_to_text {
             params.set_print_progress(false);
             params.set_print_realtime(false);
             params.set_print_timestamps(false);
+            params.set_detect_language(true);
 
             // Run the model
             let mut state = ctx.create_state()?;

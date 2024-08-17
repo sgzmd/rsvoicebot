@@ -14,10 +14,9 @@ mod tests {
             .collect() // Collect the filtered characters into a String
     }
 
-    #[test]
-    fn test_whisper_stt_wav_to_text() {
-        // Load the test .wav file
-        let file = File::open("test_assets/golden_ffmpeg.wav").expect("Failed to open test file");
+    fn test_stt(path: &str, expected: &str) {
+        let file = File::open(path).expect("Failed to open test file");
+
         let reader = BufReader::new(file);
 
         let wav_reader = WavReader::new(reader);
@@ -53,10 +52,16 @@ mod tests {
         // Perform the speech-to-text recognition
         let result = to_lowercase_and_remove_punctuation(&whisper_stt.wav_to_text(&wav_data).expect("STT failed"));
 
-        // Define the expected output
+        // Assert the result matches the expected text
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn test_whisper_stt_wav_to_text_en() {
+        // Load the test .wav file
+        let path = "test_assets/golden.wav";
         let expected_text = to_lowercase_and_remove_punctuation("this is a test, this is just a test");
 
-        // Assert the result matches the expected text
-        assert_eq!(result, expected_text);
+        test_stt(path, expected_text.as_str());
     }
 }
