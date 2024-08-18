@@ -58,7 +58,7 @@ mod tests {
     #[test]
     fn test_whisper_stt_wav_to_text_en() {
         // Load the test .wav file
-        let path = "test_assets/golden.wav";
+        let path = "test_assets/golden_ffmpeg.wav";
         let expected_text = to_lowercase_and_remove_punctuation("this is a test, this is just a test");
 
         test_stt(path, expected_text.as_str());
