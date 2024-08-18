@@ -1,9 +1,8 @@
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use std::fs::File;
-    use std::io::{BufReader, Read};
     use hound::{SampleFormat, WavReader};
+    use std::fs::File;
+    use std::io::BufReader;
     use voicebot::speech_to_text::speech_to_text::WhisperSTT;
 
     fn to_lowercase_and_remove_punctuation(input: &str) -> String {
