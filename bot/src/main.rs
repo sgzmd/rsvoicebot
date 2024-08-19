@@ -1,7 +1,10 @@
-use teloxide::{net::Download, prelude::*, types::BotCommand, utils::command::BotCommands};
-use voicebot::audio_conversion::audio_conversion::AudioConverter;
 use std::error::Error;
+use std::fs::File;
 use teloxide::types::Currency::AUD;
+use teloxide::{net::Download, prelude::*, types::BotCommand, utils::command::BotCommands};
+use voicebot::audio_conversion::audio_conversion::{convert_wav_to_samples, AudioConverter};
+use voicebot::ffmpeg_converter::audio_conversion::{AudioConverter as FFMpegAC, FFMpegAudioConverter};
+use voicebot::speech_to_text::speech_to_text::{SpeechToText, WhisperSTT};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
@@ -10,7 +13,13 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let bot = Bot::from_env();
 
-    Command::repl(bot, answer).await;
+    teloxide::repl(
+        bot,
+        |bot: Bot, msg: Message| async move {
+            recognize(bot, msg).await?;
+            Ok(())
+        },
+    ).await;
 
     Ok(())
 }
@@ -30,11 +39,12 @@ enum Command {
 }
 
 async fn answer(bot: Bot, msg: Message, cmd: Command) -> ResponseResult<()> {
-    match cmd {
-        Command::Help => help(bot, msg).await?,
-        Command::Recognize => recognize(bot, msg).await?,
-        Command::Summarize => summarize(bot, msg).await?,
-    }
+    recognize(bot, msg).await?;
+    // match cmd {
+    //     Command::Help => help(bot, msg).await?,
+    //     Command::Recognize => recognize(bot, msg).await?,
+    //     Command::Summarize => summarize(bot, msg).await?,
+    // }
 
     Ok(())
 }
@@ -46,31 +56,42 @@ async fn help(bot: Bot, msg: Message) -> ResponseResult<()> {
 }
 
 async fn recognize(bot: Bot, msg: Message) -> ResponseResult<()> {
-    let text = msg.text().unwrap_or("No text provided");
-    let response = format!("Recognized text: {}", text);
+    let mut file_id : Option<String> = None;
 
-    if let Some(audio) = msg.audio() {
-        let file = audio.file.clone();
-        let file_id = file.unique_id;
+    if let Some(voice) = msg.voice() {
+        log::info!("This is a voice message");
+        file_id = Some(voice.clone().file.id);
 
-        // Download the audio file
-        let file = bot.get_file(file_id).await?;
+    } else if let Some(audio) = msg.audio() {
+        log::info!("Generic audio file attached to the message");
+        file_id = Some(audio.clone().file.id);
+    }
+
+    if let Some(fid) = file_id {
+        let file = bot.get_file(fid).await?;
 
         let mut buffer: Vec<u8> = Vec::new();
         bot.download_file(&file.path, &mut buffer).await?;
 
-        // let converter = SymphoniaConverter;
-        // let wavbytes = converter.convert_audio_to_wav(buffer.as_slice());
-        //
-        // if wavbytes.is_ok() {
-        //     log::info!(
-        //         "Successfully converted audio to wav, {} bytes read",
-        //         wavbytes.unwrap().len()
-        //     );
-        // }
+        let converter = FFMpegAudioConverter;
+
+        // FIXME: replace unwrap with better error propagation
+        let wavbytes = converter
+            .convert_audio_to_wav(buffer.as_slice())
+            .unwrap();
+
+        // FIXME: replace unwrap with better error propagation
+        let samples = convert_wav_to_samples(wavbytes.as_slice()).unwrap();
+        let stt = WhisperSTT {};
+        let recognized_text = stt.recognize(&samples);
+
+        log::info!("Recognized text: {}", recognized_text);
+
+        bot.send_message(msg.chat.id, recognized_text).await?;
+    } else {
+        bot.send_message(msg.chat.id, "Something went wrong").await?;
     }
 
-    bot.send_message(msg.chat.id, response).await?;
 
     Ok(())
 }
