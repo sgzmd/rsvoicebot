@@ -1,3 +1,4 @@
+use std::env;
 use std::error::Error;
 use std::fs::File;
 use std::time::Instant;
@@ -90,7 +91,13 @@ async fn recognize(bot: Bot, msg: Message) -> ResponseResult<()> {
         let minutes = total_seconds / 60;
         let seconds = total_seconds % 60;
 
-        let expected_time = (total_seconds as f64 / 16.0) as u64;
+        let ratio: f64 = env::var("RECORDING_TO_WALL_RATIO")
+            .unwrap_or("10".to_string())  // Use 10 as a default value if the env variable is not set
+            .parse()                      // Parse the string to a floating-point number
+            .unwrap_or(10.0);             // Use 10 as a default value if parsing fails
+
+        let expected_time = (total_seconds as f64 / ratio) as u64;
+
         let expected_minutes = expected_time / 60;
         let expected_seconds = expected_time % 60;
 
