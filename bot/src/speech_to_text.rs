@@ -1,4 +1,5 @@
 pub mod speech_to_text {
+    use std::env;
     use std::io::Write;
     use tempfile::NamedTempFile;
     use whisper_rs::{FullParams, WhisperContext};
@@ -27,9 +28,10 @@ pub mod speech_to_text {
             let f32_wav_data = wav_data.to_owned();
 
             // Load the Whisper model
-            let ctx = WhisperContext::new("/home/sgzmd/code/voicebot/models/ggml-base.bin")?;
+            let ggml_path = env::var("GGML").expect("GGML environment variable not set");
+            let ctx = WhisperContext::new(ggml_path.as_str())?;
 
-            // Set up the parameters
+             // Set up the parameters
             let mut params = FullParams::new(whisper_rs::SamplingStrategy::Greedy { best_of: 1 });
             params.set_print_special(false);
             params.set_print_progress(false);
