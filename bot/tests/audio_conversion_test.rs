@@ -38,7 +38,8 @@ mod tests {
         // Now, `buffer` contains the WAV file bytes
         // Convert the WAV bytes to samples using the function under test
         let result = convert_wav_to_samples(&buffer);
-        let samples = result.expect("Failed to convert WAV to samples");
+        let audio_data = result.expect("Failed to convert WAV to samples");
+        let samples = audio_data.samples;
 
         // Ensure that the samples vector is not empty
         assert!(!samples.is_empty(), "The samples vector is empty");
@@ -49,5 +50,7 @@ mod tests {
         // Check the contents of the samples (e.g., check the first few samples)
         // For a sine wave, we expect the values to oscillate between -1.0 and 1.0
         assert!(samples.iter().all(|&s| s >= -1.0 && s <= 1.0), "Samples are out of expected range");
+
+        assert_eq!(audio_data.duration, duration_seconds as f64, "The duration of the audio data does not match the expected value");
     }
 }

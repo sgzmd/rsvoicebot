@@ -3,13 +3,18 @@ pub mod audio_conversion {
     use hound::{WavReader, SampleFormat};
     use std::error::Error;
 
+    pub struct AudioData {
+        pub samples: Vec<f32>,
+        pub duration: f64, // Duration in seconds
+    }
+
     // AudioConverter trait with a single method to convert audio data to WAV format.
     // It returns bytes of the converted WAV file (pcm,_s16le, 44100 Hz), not the samples.
     pub trait AudioConverter {
         fn convert_audio_to_wav(&self, input_data: &[u8]) -> Result<Vec<u8>, Box<dyn Error>>;
     }
 
-    pub fn convert_wav_to_samples(wav_bytes: &[u8]) -> Result<Vec<f32>, Box<dyn Error>> {
+    pub fn convert_wav_to_samples(wav_bytes: &[u8]) -> Result<AudioData, Box<dyn Error>> {
         // Create a cursor for the input bytes
         let cursor = Cursor::new(wav_bytes);
 
@@ -43,6 +48,17 @@ pub mod audio_conversion {
             }
         };
 
-        Ok(wav_data)
+        // Calculate the duration of the audio clip
+        let sample_rate = wr.spec().sample_rate as usize;
+        let num_channels = wr.spec().channels as usize;
+        let num_samples = wav_data.len();
+
+        let duration_seconds = num_samples as f64 / (sample_rate * num_channels) as f64;
+
+        // Return an AudioData struct with the samples and duration
+        Ok(AudioData {
+            samples: wav_data,
+            duration: duration_seconds,
+        })
     }
 }
