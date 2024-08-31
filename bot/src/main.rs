@@ -119,7 +119,7 @@ async fn recognize(bot: Bot, msg: Message) -> ResponseResult<()> {
         )
             .await?;
 
-        let stt = WhisperSTT {};
+        let stt = WhisperSTT::new(Option::None).unwrap();
 
         let start_time = Instant::now();
         let recognized_text = stt.recognize(&samples);

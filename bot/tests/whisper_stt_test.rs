@@ -46,7 +46,7 @@ mod tests {
 
 
         // Create an instance of WhisperSTT
-        let whisper_stt = WhisperSTT {};
+        let whisper_stt = WhisperSTT::new(Option::None).unwrap();
 
         // Perform the speech-to-text recognition
         let result = to_lowercase_and_remove_punctuation(&whisper_stt.wav_to_text(&wav_data).expect("STT failed"));

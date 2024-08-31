@@ -17,7 +17,17 @@ pub mod audio_conversion {
             // Create a temporary file to store the input data
             let mut input_file = NamedTempFile::new()?;
             input_file.write_all(input_data)?;
+            let input_path = input_file
+                .path()
+                .to_str()
+                .ok_or_else(|| "Invalid input file path")?;
 
+            Self::convert_file_to_wav(input_path)
+        }
+    }
+
+    impl FFMpegAudioConverter {
+        pub fn convert_file_to_wav(input_path: &str) -> Result<Vec<u8>, Box<dyn Error>> {
             // Create another temporary file to store the output WAV data
             let output_file = NamedTempFile::new()?;
             let output_path = output_file.path().to_str().ok_or("Invalid output file path")?;
@@ -26,7 +36,7 @@ pub mod audio_conversion {
             let status = Command::new("ffmpeg")
                 .arg("-y")  // Overwrite output file if it exists
                 .arg("-i")
-                .arg(input_file.path()) // Input file path
+                .arg(input_path) // Input file path
                 .arg("-ar")
                 .arg("16000") // Sample rate 16 kHz
                 .arg("-ac")

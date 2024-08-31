@@ -18,6 +18,10 @@ whisper-rs = "0.8.0"
 name = "voicebot"
 path = "src/main.rs"
 
+[[bin]]
+name = "benchmark"
+path = "src/benchmark.rs"
+
 [lib]
 name = "voicebot"
 path = "src/lib.rs"

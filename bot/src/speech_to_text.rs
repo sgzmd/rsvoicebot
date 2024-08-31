@@ -1,5 +1,6 @@
 pub mod speech_to_text {
     use std::env;
+    use std::error::Error;
     use std::io::Write;
     use tempfile::NamedTempFile;
     use whisper_rs::{FullParams, WhisperContext};
@@ -15,6 +16,7 @@ pub mod speech_to_text {
 
 
     pub struct WhisperSTT {
+        model_path: String,
     }
     impl SpeechToText for WhisperSTT {
         fn recognize(&self, audio: &Vec<f32>) -> String {
@@ -23,13 +25,20 @@ pub mod speech_to_text {
     }
 
     impl WhisperSTT {
+        pub fn new(ggml_path: Option<&str>) -> Result<Self, Box<dyn Error>> {
+            let model_path = match ggml_path {
+                Some(path) => path.to_owned(),
+                None => env::var("GGML").expect("GGML env var not set"),
+            };
+
+            Ok(WhisperSTT { model_path })
+        }
+
         pub fn wav_to_text(&self, wav_data: &Vec<f32>) -> Result<String, Box<dyn std::error::Error>> {
             // Create a temporary file to store the .wav data
             let f32_wav_data = wav_data.to_owned();
 
-            // Load the Whisper model
-            let ggml_path = env::var("GGML").expect("GGML environment variable not set");
-            let ctx = WhisperContext::new(ggml_path.as_str())?;
+            let ctx = WhisperContext::new(&self.model_path)?;
 
              // Set up the parameters
             let mut params = FullParams::new(whisper_rs::SamplingStrategy::Greedy { best_of: 1 });
