@@ -1,6 +1,7 @@
 pub mod speech_to_text {
     use std::env;
     use std::error::Error;
+    use std::ffi::c_int;
     use std::io::Write;
     use tempfile::NamedTempFile;
     use whisper_rs::{FullParams, WhisperContext};
@@ -35,6 +36,9 @@ pub mod speech_to_text {
         }
 
         pub fn wav_to_text(&self, wav_data: &Vec<f32>) -> Result<String, Box<dyn std::error::Error>> {
+            let whisper_threads = env::var("WHISPER_THREADS").unwrap_or_else(|_| "4".to_string());
+            let n_threads: c_int = whisper_threads.parse()?;
+
             // Create a temporary file to store the .wav data
             let f32_wav_data = wav_data.to_owned();
 
@@ -46,6 +50,7 @@ pub mod speech_to_text {
             params.set_print_progress(false);
             params.set_print_realtime(false);
             params.set_print_timestamps(false);
+            params.set_n_threads(n_threads);
 
             // Run the model
             let mut state = ctx.create_state()?;
