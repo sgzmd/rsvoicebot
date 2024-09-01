@@ -3,7 +3,7 @@ use std::error::Error;
 use std::time::Instant;
 use log::info;
 use voicebot::audio_conversion::audio_conversion::{convert_wav_to_samples, AudioConverter};
-use voicebot::ffmpeg_converter::audio_conversion::{AudioConverter as FFMpegAC, FFMpegAudioConverter};
+use voicebot::ffmpeg_converter::audio_conversion::FFMpegAudioConverter;
 use voicebot::speech_to_text::speech_to_text::{SpeechToText, WhisperSTT};
 
 fn main() {

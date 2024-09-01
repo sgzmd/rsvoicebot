@@ -1,7 +1,9 @@
 #[cfg(test)]
 mod tests {
     use std::fs;
-    use voicebot::ffmpeg_converter::audio_conversion::{AudioConverter, FFMpegAudioConverter};
+    // use voicebot::ffmpeg_converter::audio_conversion::{voicebot::audio_conversion::audio_conversion::AudioConverter, FFMpegAudioConverter};
+    use voicebot::ffmpeg_converter::audio_conversion::FFMpegAudioConverter;
+    use voicebot::audio_conversion::audio_conversion::AudioConverter;
 
     #[test]
     fn test_mp3_to_wav_conversion() {

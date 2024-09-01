@@ -4,11 +4,7 @@ pub mod audio_conversion {
     use std::io::{Write, Read};
     use std::fs::File;
     use tempfile::NamedTempFile;
-
-    // AudioConverter trait with a single method to convert audio data to WAV format.
-    pub trait AudioConverter {
-        fn convert_audio_to_wav(&self, input_data: &[u8]) -> Result<Vec<u8>, Box<dyn Error>>;
-    }
+    use crate::audio_conversion::audio_conversion::AudioConverter;
 
     pub struct FFMpegAudioConverter;
 
