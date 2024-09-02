@@ -12,9 +12,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN USER=root cargo new --bin app
 WORKDIR /app
 
-COPY ./Cargo.toml ./Cargo.toml
-COPY ./Cargo.lock ./Cargo.lock
-COPY ./src ./src
+COPY Cargo.toml ./Cargo.toml
+COPY Cargo.lock ./Cargo.lock
+COPY src ./src
 
 RUN cargo build --release
 

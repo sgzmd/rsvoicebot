@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  voice_bot:
+    build: .
+    image: voice_bot_image
+    environment:
+      - TELOXIDE_TOKEN
+    restart: always
